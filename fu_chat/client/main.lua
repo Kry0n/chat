@@ -78,3 +78,111 @@ AddEventHandler('sendProximityMessageDo', function(id, name, message)
     TriggerEvent('chatMessage', "", {255, 0, 0}, " ^0* " .. name .."  ".."^0  " .. message)
   end
 end)
+
+
+
+-- police
+
+
+ESX = nil
+
+Citizen.CreateThread(function()
+	while ESX == nil do
+		TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
+		Citizen.Wait(0)
+	end
+
+	while ESX.GetPlayerData().job == nil do
+		Citizen.Wait(10)
+	end
+
+	PlayerData = ESX.GetPlayerData()
+end)
+
+Citizen.CreateThread(function()
+	while true do
+		Citizen.Wait(60000)
+		PlayerData = ESX.GetPlayerData()
+	end
+end)
+
+
+RegisterCommand('911', function(source, args, rawCommand)
+    local playerCoords = GetEntityCoords(PlayerPedId())
+		streetName,_ = GetStreetNameAtCoord(playerCoords.x, playerCoords.y, playerCoords.z)
+        streetName = GetStreetNameFromHashKey(streetName)
+	local msg = rawCommand:sub(5)
+	local emergency = '911'
+    TriggerServerEvent('fu_chat:911',{
+        x = ESX.Math.Round(playerCoords.x, 1),
+        y = ESX.Math.Round(playerCoords.y, 1),
+        z = ESX.Math.Round(playerCoords.z, 1)
+    }, msg, streetName, emergency)
+    print('cunt')
+
+    local src = GetPlayerServerId(source)
+    local message = 'Please be calm, we have sent units your way they should be there soon! Please hold on.'
+    TriggerServerEvent('fu_chat:server:sourceEmergency', src, message)
+    print('usless')
+end, false)
+
+RegisterCommand('311', function(source, args, rawCommand)
+    local playerCoords = GetEntityCoords(PlayerPedId())
+		streetName,_ = GetStreetNameAtCoord(playerCoords.x, playerCoords.y, playerCoords.z)
+        streetName = GetStreetNameFromHashKey(streetName)
+	local msg = rawCommand:sub(5)
+	local emergency = '311'
+    TriggerServerEvent('fu_chat:911',{
+        x = ESX.Math.Round(playerCoords.x, 1),
+        y = ESX.Math.Round(playerCoords.y, 1),
+        z = ESX.Math.Round(playerCoords.z, 1)
+    }, msg, streetName, emergency)
+end, false)
+
+
+RegisterNetEvent('fu_chat:911Marker')
+AddEventHandler('fu_chat:911Marker', function(targetCoords, type)
+    if PlayerData.job.name == 'police' or PlayerData.job.name == 'ambulance' then
+        local alpha = 150
+        local call = AddBlipForCoord(targetCoords.x, targetCoords.y, targetCoords.z)
+
+		SetBlipSprite (call, 458)
+		SetBlipDisplay(call, 6)
+		SetBlipScale  (call, 3.2)
+        SetBlipAsShortRange(call, true)
+        SetBlipAlpha(call, alpha)
+
+        SetBlipHighDetail(call, true)
+		SetBlipAsShortRange(call, true)
+
+		if type == '911' or '311' then
+			SetBlipColour (call, 39)
+			BeginTextCommandSetBlipName('STRING')
+			AddTextComponentString('911 Call')
+	    EndTextCommandSetBlipName(call)
+		end
+
+		while alpha ~= 0 do
+			Citizen.Wait(100 * 4)
+			alpha = alpha - 1
+			SetBlipAlpha(call, alpha)
+
+			if alpha == 0 then
+				RemoveBlip(call)
+				return
+			end
+        end
+    end
+end)
+
+
+
+RegisterNetEvent('fu_chat:EmergencySend')
+AddEventHandler('fu_chat:EmergencySend', function(messageFull)
+    if PlayerData.job.name == 'police' or PlayerData.job.name == 'ambulance' then
+      TriggerServerEvent('fu_chat:server:emergency', messageFull)
+      PlaySoundFrontend(-1, "Menu_Accept", "Phone_SoundSet_Default", 1)
+      print('pussy')
+    end
+end)
+

@@ -79,7 +79,7 @@ window.APP = {
     ON_SUGGESTION_ADD({ suggestion }) {
       const duplicateSuggestion = this.backingSuggestions.find(a => a.name == suggestion.name);
       if (duplicateSuggestion) {
-        if(suggestion.help || suggestion.params) {
+        if (suggestion.help || suggestion.params) {
           duplicateSuggestion.help = suggestion.help || "";
           duplicateSuggestion.params = suggestion.params || [];
         }
@@ -90,16 +90,20 @@ window.APP = {
       }
 
       if (this.removedSuggestions.find(a => a.name == suggestion.name)) {
+        console.log(this.removedSuggestions.indexOf(suggestion.name))
         this.removedSuggestions.splice(this.removedSuggestions.indexOf(suggestion.name), 1)
       }
+
+      console.log('Adding Command Suggestion: ' + suggestion.name + ' ' + suggestion.help);
       this.backingSuggestions.push(suggestion);
     },
     ON_SUGGESTION_REMOVE({ name }) {
-      if(this.removedSuggestions.indexOf(name) <= -1) {
+      if (this.removedSuggestions.indexOf(name) <= -1) {
         this.removedSuggestions.push(name);
       }
     },
     ON_COMMANDS_RESET() {
+      console.log('Resetting Command Suggestions');
       this.removedSuggestions = [];
       this.backingSuggestions = [];
     },
@@ -119,7 +123,7 @@ window.APP = {
       for (let i = 0; i < document.styleSheets.length; i++) {
         const styleSheet = document.styleSheets[i];
         const node = styleSheet.ownerNode;
-        
+
         if (node.getAttribute('data-theme')) {
           node.parentNode.removeChild(node);
         }
@@ -127,7 +131,7 @@ window.APP = {
 
       this.tplBackups.reverse();
 
-      for (const [ elem, oldData ] of this.tplBackups) {
+      for (const [elem, oldData] of this.tplBackups) {
         elem.innerText = oldData;
       }
 
@@ -135,14 +139,14 @@ window.APP = {
 
       this.msgTplBackups.reverse();
 
-      for (const [ id, oldData ] of this.msgTplBackups) {
+      for (const [id, oldData] of this.msgTplBackups) {
         this.templates[id] = oldData;
       }
 
       this.msgTplBackups = [];
     },
     setThemes(themes) {
-      for (const [ id, data ] of Object.entries(themes)) {
+      for (const [id, data] of Object.entries(themes)) {
         if (data.style) {
           const style = document.createElement('style');
           style.type = 'text/css';
@@ -151,7 +155,7 @@ window.APP = {
 
           document.head.appendChild(style);
         }
-        
+
         if (data.styleSheet) {
           const link = document.createElement('link');
           link.rel = 'stylesheet';
@@ -163,11 +167,11 @@ window.APP = {
         }
 
         if (data.templates) {
-          for (const [ tplId, tpl ] of Object.entries(data.templates)) {
+          for (const [tplId, tpl] of Object.entries(data.templates)) {
             const elem = document.getElementById(tplId);
 
             if (elem) {
-              this.tplBackups.push([ elem, elem.innerText ]);
+              this.tplBackups.push([elem, elem.innerText]);
               elem.innerText = tpl;
             }
           }
@@ -182,8 +186,8 @@ window.APP = {
         }
 
         if (data.msgTemplates) {
-          for (const [ tplId, tpl ] of Object.entries(data.msgTemplates)) {
-            this.msgTplBackups.push([ tplId, this.templates[tplId] ]);
+          for (const [tplId, tpl] of Object.entries(data.msgTemplates)) {
+            this.msgTplBackups.push([tplId, this.templates[tplId]]);
             this.templates[tplId] = tpl;
           }
         }
@@ -239,7 +243,7 @@ window.APP = {
       input.style.height = `${input.scrollHeight + 2}px`;
     },
     send(e) {
-      if(this.message !== '') {
+      if (this.message !== '') {
         post('http://fu_chat/chatResult', JSON.stringify({
           message: this.message,
         }));
@@ -252,7 +256,7 @@ window.APP = {
     },
     hideInput(canceled = false) {
       if (canceled) {
-        post('http://fu_chat/chatResult', JSON.stringify({ canceled }));
+        post('http://fu_chatResult', JSON.stringify({ canceled }));
       }
       this.message = '';
       this.showInput = false;

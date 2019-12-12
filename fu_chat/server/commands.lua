@@ -54,7 +54,6 @@ end
     TriggerEvent('fu_chat:server:Tweet', fal, msg)
 	end, false)
 
-
 -- OOC
  RegisterCommand('ooc', function(source, args, rawCommand)
 		local playerName = GetPlayerName(source)
@@ -63,3 +62,4 @@ end
 		fal = name.firstname .. "" .. name.lastname
   		TriggerEvent('fu_chat:server:ooc', fal, msg)
 	end, false)
+

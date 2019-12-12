@@ -64,7 +64,7 @@ end)
 RegisterServerEvent('fu_chat:server:ooc')
 AddEventHandler('fu_chat:server:ooc', function(name, message)
     TriggerClientEvent('chat:addMessage', -1, {
-        template = '<div class="chat-message ooc"> [OOC] {0} | {1}</div>',
+        template = '<div class="chat-message ooc"> OOC | {0} | {1} </div>',
         args = { name, message }
     })
     CancelEvent()
@@ -126,6 +126,26 @@ AddEventHandler('fu_chat:server:Help', function(source, message)
     CancelEvent()
 end)
 
+RegisterServerEvent('fu_chat:server:emergency')
+AddEventHandler('fu_chat:server:emergency', function(messageFull)
+    TriggerClientEvent('chat:addMessage', -1, {
+        template = '<div class="chat-message emergency">Dispatch |   {0}   | </div>',
+        args = { messageFull }
+    })
+    CancelEvent()
+end)
+
+
+RegisterServerEvent('fu_chat:server:sourceEmergency')
+AddEventHandler('fu_chat:server:sourceEmergency', function(src, message)
+    TriggerClientEvent('chat:addMessage', src, {
+        template = '<div class="chat-message system"> 911 | {0} </div>',
+        args = { message }
+    })
+    CancelEvent()
+end)
+
+
 RegisterServerEvent('fu_chat:server:SendMeToNear')
 AddEventHandler('fu_chat:server:SendMeToNear', function(source, message)
     local src = source
@@ -143,3 +163,22 @@ function stringsplit(inputstr, sep)
 	end
 	return t
 end
+
+
+
+-- Server Police
+
+
+RegisterServerEvent('fu_chat:911')
+AddEventHandler('fu_chat:911', function(targetCoords, msg, streetName, emergency)
+    local _source = source
+    local pName= getIdentity(source)
+    local code = "10-22"
+	local messageFull
+	fal = pName.firstname .. " " .. pName.lastname
+    if emergency == '911' or '311' then
+		messageFull =   {code, fal, streetName, msg} 
+	end
+	TriggerClientEvent('fu_chat:911Marker', -1, targetCoords, emergency)
+    TriggerClientEvent('fu_chat:EmergencySend', -1, messageFull)
+end)
